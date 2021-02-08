@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="event">
+	
+	<select id="selectEventSeqNextval" resultClass="int" >
+		select board_seq.nextval
+		from dual		
+	</select>
+	
+	<resultMap class="vo.BoardVO" id="eventMap">
+		<result property="boardNo" column="BOARD_NO"/>
+		<result property="boardTitle" column="BOARD_TITLE"/>
+		<result property="boardContent" column="BOARD_CONTENT"/>
+		<result property="boardGrNo" column="BOARD_GR_NO"/>
+		<result property="memNo" column="MEM_NO"/>
+		<result property="boardDate" column="BOARD_DATE"/>
+		<result property="boardCnt" column="BOARD_CNT"/>
+	</resultMap>
+	
+		
+	<insert id="insertEventBoard" parameterClass="boardVO">
+		INSERT INTO BOARD(board_no, board_title, board_content, board_gr_no, mem_no, board_date, board_cnt)
+		VALUES (#boardNo#, #boardTitle#, #boardContent#, 1, 'ADMIN', SYSDATE, 0)
+	</insert>
+	
+	
+	<select id="displayAllEvent" resultClass="boardVO">
+		select  B.BOARD_NO  		 				boardNo
+				,B.BOARD_GR_NO       				boardGrNo
+				,(select mem_id                         
+					from member                         
+				   where member.mem_no = B.mem_no)	memId
+				,B.BOARD_TITLE       				boardTitle
+				,B.BOARD_CONTENT     				boardContent
+				,B.BOARD_DATE        				boardDate
+				,B.BOARD_CNT						boardCnt
+		from (select A.*
+					,rownum as rnum
+				from (select * from board order by board_no desc) A
+                where board_gr_no = 1) B
+		where B.rnum between #firstRecNo# and #lastRecNo#
+	</select>	
+	
+	<select id="getSearchEvent" resultClass="bfVO">
+		
+		select max(board_no) from board
+		where board_gr_no = 1
+		
+	</select>
+	
+	<select id="getEventAllCount" resultClass="int">
+		select count(*) from BOARD
+		where board_gr_no = 1 
+	</select>
+	
+	<select id="getBoardNo"  resultClass="int">
+		select max(a.board_gr_no) from board a, board_file b
+		where a.board_no = b.board_no
+        and a.board_gr_no =1
+	</select>
+	
+	<select id="eventSearch" resultMap="eventMap">
+		select 
+		A.BOARD_NO, A.BOARD_GR_NO,B.MEM_ID MEM_NO
+                   ,A.BOARD_TITLE
+                   ,A.BOARD_CONTENT
+                   ,A.BOARD_DATE
+                   ,A.BOARD_CNT
+                   from BOARD A, MEMBER B
+                   WHERE A.MEM_NO = B.MEM_NO
+                   AND BOARD_NO = #boardNo#
+	</select>
+	
+	<select id="getEventList" resultClass="boardVO">
+		select board_no boardNo, board_title boardTitle,
+				board_content boardContent, board_gr_no boardGrNo,
+				mem_no memNo, board_date boardDate, board_cnt boardCnt
+				
+		 from board
+		where board_gr_no= 1
+	</select>
+	
+	<update id="updateBoard" parameterClass="boardVO">
+		update board
+		set board_title = #boardTitle#
+			,board_content = #boardContent#
+			,board_date = sysdate
+		where board_no = #boardNo#
+	</update>
+	
+	<update id="cntEventBoard" parameterClass="int">
+		update board
+		set board_cnt = board_cnt +1
+		where board_no = #boardNo#
+	</update>
+	
+	<delete id="deleteEventBoard" parameterClass="int">
+		delete from board
+		where board_no = #boardNo#
+	</delete>
+	
+</sqlMap>

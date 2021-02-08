@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="teamMem"> <!-- 팀멤버 테이블-->
+
+<select id="getTeamMember" parameterClass="String" resultClass="String">
+	select mem_id 
+	from member                                      
+	where mem_no in (select mem_no 
+           			 from team_mem 
+           			 where team_code =(select team_code 
+           			 					from team 
+           			 					where inven_code=#invenCode#))
+</select>
+
+</sqlMap>

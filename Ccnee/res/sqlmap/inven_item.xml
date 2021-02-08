@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="invenItem">
+
+	<select id="getAllInvenCnt" resultClass="int">
+		select count(*) from inven
+	</select>
+
+	<insert id="insertInven">
+		insert into inven
+		values(#invenCode#, #gameNo#)
+	</insert>
+
+	<insert id="insertInvenItem" parameterClass="iiVO">
+		insert into INVEN_ITEM (INVEN_ITEM_NO, INVEN_CODE,GAME_NO, INVEN_ITEM_INFO, INVEN_ITEM_SRC)
+		VALUES(#invenItemNo#,#invenCode#,#gameNo#,#invenItemInfo#,#invenItemSrc#)
+	
+	</insert>
+	
+	<delete id="deleteInvenItem">
+		delete from inven_item
+		where inven_item_no = #itemNo#
+	</delete>
+	
+	<select id="getInvenItem" parameterClass="String" resultClass="iiVO">
+		select INVEN_ITEM_NO invenItemNo, INVEN_CODE invenCode,GAME_NO gameNo, INVEN_ITEM_INFO InvenItemInfo, INVEN_ITEM_SRC InvenItemSrc
+		from INVEN_ITEM
+		WHERE INVEN_CODE = #INVENCODE#
+	</select>
+
+</sqlMap>

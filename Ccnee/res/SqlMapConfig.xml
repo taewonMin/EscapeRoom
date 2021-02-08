@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMapConfig      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map Config 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-config-2.dtd">
+
+<sqlMapConfig>
+   <properties resource="SqlMapConfig.properties" />
+   <settings cacheModelsEnabled="true" useStatementNamespaces="true" />
+   
+   <typeAlias alias="boardVO" type="vo.BoardVO"/>
+   <typeAlias alias="cmtVO" type="vo.CmtVO"/>
+   <typeAlias alias="mvVO" type="vo.MemberVO"/>
+   <typeAlias alias="bfVO" type="vo.BoardFileVO"/>
+   <typeAlias alias="iiVO" type="vo.Inven_ItemVO"/>
+   
+   <transactionManager type="JDBC">
+      <dataSource type="SIMPLE">
+         <property name="JDBC.Driver" value="${driver}" />
+         <property name="JDBC.ConnectionURL" value="${url}" />
+         <property name="JDBC.Username" value="${username}" />
+         <property name="JDBC.Password" value="${password}" />
+      </dataSource>
+   </transactionManager>
+   
+<!--    <sqlMap resource="member/dao/member.xml"/> -->
+<sqlMap resource="sqlmap/itemBoard.xml"/> <!-- 상점 -->
+<sqlMap resource="sqlmap/buyItem.xml"/> <!-- 아이템 구매 -->
+<sqlMap resource="sqlmap/cmt.xml"/> <!-- 댓글-->
+<sqlMap resource="sqlmap/eventBoard.xml"/> <!-- 이벤트게시판 -->
+<sqlMap resource="sqlmap/boardFile.xml"/> <!-- 보드파일 -->
+<sqlMap resource="sqlmap/board.xml"/> <!-- 게시판 통합-->
+<sqlMap resource="sqlmap/member.xml"/> <!-- 회원 -->
+<sqlMap resource="sqlmap/teamMem.xml"/> <!-- 팀멤버테이블 -->
+<sqlMap resource="sqlmap/inven_item.xml"/> <!-- 인벤아이템테이블 -->
+<sqlMap resource="sqlmap/playtime.xml"/> <!-- 플레이기록-->
+<sqlMap resource="sqlmap/team.xml"/> <!-- 팀 테이블 -->
+
+
+</sqlMapConfig>

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="itemBoard"> <!-- 상점 -->
+	
+	<!-- insert -->
+	<insert id="insertItemBoard" parameterClass="vo.ItemVO">
+	
+		INSERT INTO item (item_no, item_name, item_price, item_content, item_activate, item_file_name, item_stre_cours)
+		VALUES(item_seq.NEXTVAL, #itemName#, #itemPrice#, #itemContent#, 'Y', #itemFileName#, #itemStreCours#)
+	</insert>
+
+	<!-- update -->
+	<update id="updateItemBoard" parameterClass="vo.ItemVO">
+		UPDATE item
+		SET item_name = #itemName#,
+			item_price = #itemPrice#,
+			item_content = #itemContent#,
+			item_activate = #itemActivate#,
+			item_file_name = #itemFileName#,
+			item_stre_cours = #itemStreCours#
+		WHERE item_no = #itemNo#
+	</update>
+	
+	<!-- delete -->
+	<delete id="deleteItemBoard" parameterClass="int">
+		DELETE FROM item
+		WHERE item_no = #itemNo#
+	</delete>
+	
+	<resultMap class="vo.ItemVO" id="itemBoardMap">
+		<result property="itemNo" column="item_no"/>
+		<result property="itemName" column="item_name"/>
+		<result property="itemPrice" column="item_price"/> 
+		<result property="itemContent" column="item_content"/>
+		<result property="itemActivate" column="item_activate"/>
+		<result property="itemFileName" column="item_file_name"/>
+		<result property="itemStreCours" column="item_stre_cours"/>
+	</resultMap>
+	
+	<!-- select --> <!-- 페이징 처리해서 가져오는 리스트 -->
+	<select id="displayItemPagingBoardList" resultMap="itemBoardMap"> 
+		select aa.*
+		from
+		(select a.*, rownum as rnum from item a) aa
+		where aa.rnum between #firstRecNo# and #lastRecNo#
+		order by 1
+	</select>
+	
+	<!-- act=y 인 아이템을 페이징 처리하는 리스트 -->
+	<select id="displayItemActYpagingBoardList" resultMap="itemBoardMap"> 
+		select aa.*
+		from
+		(select a.*, rownum as rnum from item a where item_activate='Y') aa
+		where aa.rnum between #firstRecNo# and #lastRecNo#
+		order by 1
+	</select>
+	
+	<select id="getItemBoard" resultMap="itemBoardMap">
+		select *
+		from item
+		where item_no = #itemNo#
+	</select>
+	
+	<select id="displayItemBoardList" parameterClass="vo.ItemVO"  resultMap="itemBoardMap">
+		select *
+		from item
+		where item_no = #itemNo#
+	</select>
+	
+	<select id="searchItemBoard" parameterClass="vo.ItemVO" resultMap="itemBoardMap">
+		SELECT * FROM item
+		where item_name LIKE '%' || #itemName# || '%'
+	</select>
+	
+	<select id="getsearchItemAllCount" parameterClass="vo.ItemVO" resultMap="itemBoardMap">
+		SELECT count(*) FROM item
+		where item_name LIKE '%' || #itemName# || '%'
+	</select>
+	
+	<select id="getItemAllCount" resultClass="int">
+		select count(*) from item
+	</select>
+	
+	<select id="getItemActYcount" resultClass="int">
+		select count(*) from item
+		where item_activate = 'Y'
+	</select>
+	
+	<select id="getItemNo" resultClass="int">
+		select item_seq.CURRVAL
+		from dual
+	</select>
+	
+	<select id="getItemList" resultClass="vo.ItemVO">
+		select b.item_name itemName, b.item_content itemContent, b.item_file_name itemFileName,  dense_rank() over(order by a.buy_date asc) rank 
+		from buy a, item b
+    	where a.item_no=b.item_no
+    	<![CDATA[and rownum <= 5]]>
+	</select>
+</sqlMap>
+
+

@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="member"> <!-- 회원 -->
+	
+	<!-- insert -->
+	<insert id="insertMember" parameterClass="mvVO">
+	
+		INSERT INTO MEMBER
+		VALUES(dbms_random.string('x',7), #memId#, #memName#, #memPass#
+				, #memTel#, #memEmail#, #memBir#, 1000, 'N', 'Y', '', 0)
+	</insert>
+		
+	<update id="updateMember" parameterClass="mvVO"> <!-- 회원정보 수정 -->
+		UPDATE member
+		SET mem_name = #memName#,
+			mem_pass = #memPass#,
+			mem_tel = #memTel#,
+			mem_email = #memEmail#
+		WHERE mem_id = #memId#
+	</update>
+	
+	<update id="outMember" parameterClass="String"> <!-- 회원 탈퇴 -->
+		UPDATE member
+		SET ACTIVATE = 'N'
+		WHERE mem_id = #memId#
+	</update>
+	
+	<update id="updateItemStauts" parameterClass="String"> <!-- 아이템 status 변경 -->
+		UPDATE buy
+		SET use_status = 'Y'
+		WHERE buy_no = #buyNo#
+	</update>
+	
+	<update id="plusPoint" parameterClass="mvVO"> <!-- point plus 아이템 사용 -->
+		UPDATE member
+		SET mem_point = mem_point+#memPoint#
+		WHERE mem_id = #memId#
+	</update>
+	
+	<resultMap class="mvVO" id="memberMap">
+		<result property="memNo" column="mem_no"/>
+		<result property="memId" column="mem_id"/>
+		<result property="memName" column="mem_name"/>
+		<result property="memPass" column="mem_pass"/> 
+		<result property="memTel" column="mem_tel"/>
+		<result property="memEmail" column="mem_email"/>
+		<result property="memBir" column="mem_bir"/>
+		<result property="memPoint" column="mem_point"/>
+		<result property="memBlack" column="MEM_BLACK"/>
+		<result property="activate" column="ACTIVATE"/>
+		<result property="memCnt" column="MEM_CNT"/>
+	</resultMap>
+	
+	<select id="memberList" resultMap="memberMap">
+		select * from member 
+	</select>
+	
+	<select id="getMember" resultMap="memberMap">
+		select *
+		from member
+		where mem_id = #memId#
+	</select>
+	
+<!-- 	아이디찾기 -->
+	<select id="findNameAndEmail" resultMap="memberMap">
+		select *
+		from member
+		where MEM_NAME = #memName#
+		AND MEM_EMAIL = #memEmail#
+	</select>
+	
+<!-- 	비밀번호찾기 -->
+	<select id="findIdAndTel" resultMap="memberMap">
+		select *
+		from member
+		where MEM_ID = #memId#
+		AND MEM_TEL = #memTel#
+	</select>
+	
+<!-- 	임시비밀번호로 변경 -->
+	<update id="updatePass" parameterClass="mvVO"> <!-- 회원정보 수정 -->
+		UPDATE member
+		SET mem_pass = #memPass#
+		WHERE mem_id = #memId#
+	</update>
+	
+	<select id="getMemHasItemList" resultClass="vo.ItemVO"> <!-- 회원이 구매한 아이템VO -->
+		SELECT item_name itemName , item_file_name itemFileName, b.buy_no itemNo
+    	FROM item a, buy b
+   		WHERE a.item_no=b.item_no
+        	AND b.mem_no=#memNo#   
+	</select>
+	
+	<select id="buyItemStatus" parameterClass="String" resultClass="vo.BuyVO"> <!-- 멤버가 가진 아이템 STATUS 체크 -->
+		select item_no itemNo, use_status useStatus, buy_no buyNo
+		from buy
+		where mem_no = #memNo#
+	</select>
+	
+	<select id="memberRanking" resultClass="vo.PlaytimeVO"> <!-- 회원의 게임 기록 -->
+		select play_record playRecord, play_date playDate
+		from playtime a, team_mem b
+		where a.team_code = b.team_code
+			and b.mem_no=#memNo#
+		order by play_date desc
+	</select>
+	
+	<update id="updateCnt" parameterClass="String">
+		UPDATE member SET mem_cnt=mem_cnt+1 WHERE mem_id=#toMemId#
+	</update>
+	
+	<!-- 로그인 ID 중복체크 -->
+	<select id="newIdChk" parameterClass="String" resultClass="int">
+		select count(*) from member
+		where mem_id = #memId#
+		and activate = 'Y'
+	</select>
+	
+	<!-- 이메일 중복체크 -->
+	<select id="newEmailChk" parameterClass="String" resultClass="int">
+		select count(*) from member
+		where mem_email = #memEmail#
+	</select>
+	<!-- 핸드폰 중복체크 -->
+	<select id="newHpChk" parameterClass="String" resultClass="int">
+		select count(*) from member
+		where mem_tel = #memTel#
+	</select>
+
+	<select id="loginPassChk" parameterClass="String" resultClass="int">
+		select count(*) from member
+		where mem_pass = #memPass#
+		and activate = 'Y'
+	</select>
+	
+	<select id="getPlayMemId" parameterClass="String" resultClass="String">
+		select a.mem_id memId from
+	    member a, team_mem b
+	    where a.mem_no = b.mem_no
+	    and b.team_code = #teamCode#
+	</select>
+	
+
+<!-- 	회원관리용 리스트(페이징필요) -->
+	<select id="memberManagementList" resultClass="mvVO">
+		  select b.MEM_NO memNo
+				,b.MEM_ID  memId
+				,b.MEM_NAME    memName
+				,b.MEM_PASS    memPass
+				,b.MEM_TEL memTel
+				,b.MEM_EMAIL   memEmail
+				,b.MEM_BIR memBir
+				,b.MEM_POINT   memPoint
+				,b.MEM_BLACK   memBlack
+				,b.ACTIVATE    activate
+				,b.MEM_ALIAS   memAlias
+				,b.MEM_CNT memCnt
+		from(select a.*, rownum as rnum from member a order by MEM_CNT desc) b 
+		where b.rnum between #firstRecNo# and #lastRecNo#
+	</select>
+	
+<!-- 	멤버테이블 전체 카운트 -->
+	<select id="getMemberAllCount" resultClass="int">
+		select count(*) from member
+	</select>
+	
+<!-- 	회원관리 상세보기용 -->
+	<select id="selectMember" resultMap="memberMap">
+		select * from member where mem_no = #memNo#
+	</select>
+	
+<!-- 회원블랙리스트변경 -->
+	<update id="updateManagment" parameterClass="mvVO"> 
+		UPDATE member
+		SET MEM_BLACK = #memBlack#
+        where MEM_NO= #memNo#
+	</update>
+</sqlMap>

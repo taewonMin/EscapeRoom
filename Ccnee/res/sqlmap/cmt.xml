@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="cmt">
+
+	<resultMap class="cmtVO" id="cmtMap">
+		<result property="cmtContent" column="CMT_CONTENT"/>
+		<result property="cmtNo" column="CMT_NO"/>
+		<result property="boardNo" column="BOARD_NO"/>
+		<result property="memNo" column="MEM_NO"/>
+		<result property="cmtDate" column="CMT_DATE"/>
+	</resultMap>
+
+ 	
+ 	
+ 	<select id="cmtListAll" parameterClass="int" resultMap="cmtMap" >
+ 		select cmt_content, cmt_no, b.mem_id mem_no, board_NO , cmt_date
+		from cmt a, member b 
+		where board_no = #board_no# 
+    	and a.mem_no = b.MEM_NO
+    	order by cmt_no 
+ 	</select>
+ 	
+ 	<insert id="insertCmt" parameterClass="cmtVO">
+	insert into cmt
+ 		(
+ 		CMT_NO
+ 		,CMT_CONTENT
+		,BOARD_NO
+		,mem_no
+		,cmt_date
+		) 
+	values (cmt_seq.nextval,#cmtContent#,#boardNo#,#memNo#,sysdate)
+ 	
+ 	</insert>
+
+	<delete id="deleteCmt" parameterClass="int">
+	
+	 		delete from cmt where CMT_NO = #cmtNo# 
+	
+	</delete>
+	
+	<update id="updateCmt" parameterClass="cmtVO">
+	UPDATE  CMT
+	 SET CMT_DATE = SYSDATE
+	 , CMT_CONTENT = #cmtContent#
+ 	WHERE CMT_NO = #cmtNo#
+	
+	</update>
+	
+ 	
+</sqlMap>
+
+
+
+
+

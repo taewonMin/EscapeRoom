@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="boardFile">
+	
+	
+	<insert id="insertEventFile" parameterClass="vo.BoardFileVO" >
+		INSERT INTO BOARD_FILE(BOARD_FILE_NO, BOARD_NO, BOARD_FILE_NAME, BOARD_FILE_ORIGIN
+									, BOARD_STRE_COURS, BOARD_FILE_EXTSN, BOARD_FILE_CREAT)
+		VALUES (board_file_seq.nextval, #boardNo# , #boardFileName#, #boardFileOrigin#, #boardStreCours#,
+					#boardFileExtsn#, sysdate)
+	</insert>
+	
+<!-- 	<insert id="insertDetailFile" parameterClass="vo.BoardFileVO" > -->
+<!-- 		INSERT INTO BOARD_FILE(BOARD_FILE_NO, BOARD_NO, BOARD_FILE_ID, BOARD_FILE_NAME, BOARD_FILE_ORIGIN -->
+<!-- 									, BOARD_STRE_COURS, BOARD_FILE_EXTSN, BOARD_FILE_CREAT) -->
+<!-- 		VALUES (board_file_seq.nextval, #boardNo# , 'test', #boardFileName#, #boardFileOrigin#, #boardStreCours#, -->
+<!-- 					#boardFileExtsn#, sysdate, 'Y') -->
+<!-- 	</insert> -->
+	
+	
+	<resultMap class="bfVO" id="boardFileMap">
+		<result property="boardFileNo" column="BOARD_FILE_NO"/>
+		<result property="boardNo" column="BOARD_NO"/>
+		<result property="boardFileName" column="BOARD_FILE_NAME"/>
+		<result property="boardFileOrigin" column="BOARD_FILE_ORIGIN"/>
+		<result property="boardStreCours" column="BOARD_STRE_COURS"/>
+		<result property="boardFileExtsn" column="BOARD_FILE_EXTSN"/>
+		<result property="boardFileCreat" column="BOARD_FILE_CREAT"/>
+	</resultMap>
+	
+	<select id="getBoardFileList" resultClass="bfVO" >
+		select board_file_no boardFileNo, board_no boardNo
+				,board_file_name boardFileName, board_file_origin boardFileOrigin,
+				board_stre_cours boardStreCours, board_file_extsn boardFileExtsn
+				,board_file_creat boardFileCreat
+		from (select C.*
+		            ,rownum as rnum
+		        from (select B.*
+		                from board A, board_file B
+		                where A.board_no = B.board_no
+		                and board_gr_no = 1
+		                order by A.board_no desc) C) D
+		where D.rnum between 1 and 10    
+	</select>
+	
+	<select id="eventFileSearch" resultMap="boardFileMap">
+		 select 
+            b.board_file_no,
+			b.board_no, 
+			b.board_file_name,
+            b.board_file_origin,
+            b.board_stre_cours,
+            b.board_file_extsn,
+            b.board_file_creat    
+    	from board a, board_file b
+    	where a.board_no = b.board_no
+   		 and b.board_no=#boardNo#
+	</select>
+	
+	<update id="updateEventFile" parameterClass="bfVO">
+		update board_file
+    	set
+        board_file_name = #boardFileName#,
+        board_file_origin = #boardFileOrigin#,
+        board_file_extsn = #boardFileExtsn#,
+        board_file_creat = sysdate
+        where board_no =#boardNo#
+	</update>
+	
+	<delete id="deleteFile" parameterClass="int">
+		delete from board_file
+		where board_no = #boardNo#
+	</delete>
+</sqlMap>			

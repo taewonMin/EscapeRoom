@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="playtime">
+
+<!-- <resultMap class="vo.PlaytimeVO" id="playMap"> -->
+<!-- 	<result property="playNo" column="PLAY_NO"/> -->
+<!-- 	<result property="teamCode" column="TEAM_CODE"/> -->
+<!-- 	<result property="playRecord" column="PLAY_RECORD"/> -->
+<!-- 	<result property="playDate" column="PLAY_DATE"/> -->
+<!-- 	<result property="playStatus" column="PLAY_STATUS"/> -->
+<!-- </resultMap> -->
+<insert id="insertPlaytime">
+	insert into playtime
+	values(playtime_seq.nextval, #teamCode#, #playRecord#, sysdate, #playStatus#)
+</insert>
+
+<select id="displayAll" resultClass="vo.PlaytimeVO">
+	select play_no playNo, team_code teamCode, play_record playRecord, play_date playDate, play_status playStatus, dense_rank() over(order by play_record asc) rank 
+	from playtime
+	<![CDATA[where rownum <= 10]]>
+</select>
+
+<!-- <select id="getPlayMemId" resultClass="vo.PlaytimeVO"> -->
+<!-- 	select a.mem_id from -->
+<!--     member a, team_mem b -->
+<!--     where a.mem_no = b.mem_no -->
+<!--     and b.team_code = #teamCode# -->
+<!-- </select> -->
+
+</sqlMap>
+			

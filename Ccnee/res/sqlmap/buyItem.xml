@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="buyItem"> <!-- 아이템 구매 -->
+	<!-- insert -->
+	<insert id="insertBuy" parameterClass="vo.BuyVO"> <!-- buy_item 부모 -->
+		INSERT INTO buy (buy_no, item_no, mem_no, buy_date, use_status)
+		VALUES(item_seq.NEXTVAL, #itemNo#, #memNo#, sysdate, 'N')
+	</insert>
+	
+	<insert id="insertBuyItem" parameterClass="vo.BuyItemVO">
+		INSERT INTO buy_item (buy_no, item_no, buy_cnt)
+		VALUES(item_seq.CURRVAL, #itemNo#, 1)
+	</insert>
+
+	<!-- update -->
+	<update id="memPoint" parameterClass="vo.MemberVO">
+		UPDATE member
+		SET mem_point = #memPoint#
+		WHERE mem_id = #memId#
+	</update>
+
+	<!-- select -->
+	<select id="checkMemberPoint" parameterClass="String" resultClass="int"> 
+		select mem_point
+		from member
+		where mem_id = #memId#
+	</select>
+
+	
+</sqlMap>

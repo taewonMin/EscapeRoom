@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="team"> <!-- 팀 테이블-->
+
+	<select id="getAllTeamCnt" resultClass="int">
+		select count(*) from team
+	</select>
+
+	<insert id="insertTeam">
+		insert into team
+		values(#teamCode#, #invenCode#, #gameNo#)
+	</insert>
+	
+	<insert id="insertTeamMem">
+		insert into team_mem
+		values(#memNo#, #teamCode#)
+	</insert>
+</sqlMap>

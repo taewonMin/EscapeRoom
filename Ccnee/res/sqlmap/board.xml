@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="board">
+ 	<insert id="insertBoard" parameterClass="boardVO">
+ 		insert into boarD (BOARD_NO,BOARD_TITLE,BOARD_CONTENT,BOARD_GR_NO,MEM_NO,BOARD_DATE,BOARD_CNT)
+ 		values(board_seq.nextval, #boardTitle#, #boardContent#, #boardGrNo#, #memNo#, sysdate ,0)
+ 	</insert>
+ 	
+	<update id="updateBoard" parameterClass="boardVO">
+		update board
+		set board_title = #boardTitle#
+			,board_content = #boardContent#
+			,board_date = sysdate
+		where board_no = #boardNo#
+	</update>
+	
+	<delete id="deleteBoard">
+		delete from board
+		where board_no = #boardNo#
+	</delete>
+	
+	<select id="getAllBoard" resultClass="boardVO">
+		select  B.BOARD_NO  		 				boardNo
+				,B.BOARD_GR_NO       				boardGrNo
+				,(select mem_id                         
+					from member                         
+				   where member.mem_no = B.mem_no)	memId
+				,B.BOARD_TITLE       				boardTitle
+				,B.BOARD_CONTENT     				boardContent
+				,B.BOARD_DATE        				boardDate
+				,B.BOARD_CNT						boardCnt
+		from (select A.*
+					,rownum as rnum
+				from (select * from board order by board_no desc) A
+                where board_gr_no = #boardGrNo#
+                <isEqual property="criteria" compareValue="t">
+				and board_title like '%' || #search# || '%'
+				</isEqual>
+				<isEqual property="criteria" compareValue="c">
+				and board_content like '%' || #search# || '%'
+				</isEqual>
+				<isEqual property="criteria" compareValue="tc">
+				and board_title like '%' || #search# || '%'
+				or board_content like '%' || #search# || '%'
+				</isEqual>
+				<isEqual property="criteria" compareValue="w">
+				and mem_no = #search#
+				</isEqual>) B
+		where B.rnum between #firstRecNo# and #lastRecNo#
+	</select>
+	
+	<select id="getBoard" resultClass="boardVO">
+		select BOARD_NO  								boardNo
+				,BOARD_GR_NO                            boardGrNo
+				,(select mem_id                         
+					from member                         
+				   where member.mem_no = board.mem_no)  memId
+				,BOARD_TITLE                            boardTitle
+				,BOARD_CONTENT                          boardContent
+				,BOARD_DATE                             boardDate
+				,BOARD_CNT                            	boardCnt
+		from board
+		where board_no = #boardNo#
+	</select>
+	
+	<update id="updateCntBoard" parameterClass="int">
+		update board
+		set board_cnt = board_cnt+1		
+		where board_no = #boardNo#
+	</update>
+	
+	<select id="getBoardAllCount" resultClass="int">
+		select count(*)
+		from board
+		where board_gr_no = #boardGrNo#
+		<isEqual property="criteria" compareValue="t">
+		and board_title like '%' || #search# || '%'
+		</isEqual>
+		<isEqual property="criteria" compareValue="c">
+		and board_content like '%' || #search# || '%'
+		</isEqual>
+		<isEqual property="criteria" compareValue="tc">
+		and board_title like '%' || #search# || '%'
+		or board_content like '%' || #search# || '%'
+		</isEqual>
+		<isEqual property="criteria" compareValue="w">
+		and mem_no = #search#
+		</isEqual>
+	</select>
+	
+	
+</sqlMap>
