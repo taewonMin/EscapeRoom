@@ -1,0 +1,9 @@
+*.jar
+*.properties
+*.class
+log4j.xml
+resources/
+views/
+build/
+.settings
+.project
